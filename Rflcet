@@ -1,0 +1,47 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+import csv
+import pandas as pd
+import os
+
+#遍历文件名称
+froot=r'D:\11 PL\source'
+f=[]
+
+for root,dirs,files in os.walk(froot):
+    for file in files:
+        f.append(os.path.join(root,file))
+#  os.path.join(root,file)    
+# root是指当前目录路径(文件夹的绝对路径)
+# dirs是指路径下所有的子目录(文件夹里的文件夹)
+# files是指路径下所有的文件(文件夹里所有的文件)      
+ 
+ #遍历处理每个数据       
+i=0
+
+for i in range(len(f)):
+
+#f[i].split('\\')[-1]
+
+#读取文件
+    df=pd.read_csv(f[i] ,
+                   skiprows=(23),
+                   header=None, 
+                   names=['WL','Signal','baseline']
+                   )
+    #归一化反射率
+    Remax=df['Signal'].max()                       
+    df['Signal']=df['Signal'].apply(lambda x : "%.3f"% ((x/Remax)*100.0))
+    del df['baseline']
+    
+    
+    toroot=r'D:\11 PL\to'  #导出目标地址
+    fl=f[i].split('\\')[-1] #文件名+后缀名
+    fto=os.path.splitext(fl)[0] #文件名不含后缀名
+    #导出文件txt
+    df.to_csv(toroot+"\\"+fto+'.txt', index=False, header=None)
